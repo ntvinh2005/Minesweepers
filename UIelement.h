@@ -1,11 +1,25 @@
 #include <string>
 #include <iostream>
+#include <map>
 #include <SFML/Graphics.hpp>
+#include <functional>
 using namespace std;
 
 class ResourceManager {
+private:
+    static std::map<std::string, sf::Texture> textures;
 public:
     static sf::Font& getFont(std::string& fontPath);
+    static sf::Texture& getTexture(const std::string& texturePath) {
+        if (textures.find(texturePath) == textures.end()) {
+            sf::Texture texture;
+            if (!texture.loadFromFile(texturePath)) {
+                throw std::runtime_error("Error: Could not load texture from " + texturePath);
+            }
+            textures[texturePath] = std::move(texture);
+        }
+        return textures[texturePath];
+    }
 };
 
 class Label {
@@ -48,4 +62,38 @@ public:
     void handleEvent(sf::Event& event);
     void draw(sf::RenderWindow& window);
     string getText();
+};
+
+class Sprite {
+private:
+    sf::Sprite sprite;
+    sf::Texture texture;
+public:
+    Sprite() = default;
+    void setTexture (string texturePath);
+    void setPosition(float x, float y);
+    void setScale(float scaleX, float scaleY);
+
+    void setOrigin(float x, float y);
+
+    void draw(sf::RenderWindow& window);
+
+    sf::Sprite& getSprite();
+};
+
+class Button {
+private:
+    sf::RectangleShape box;
+    sf::Text text;
+    sf::Color defaultColor;
+    sf::Color hoverColor;
+    sf::Color activeColor;
+    std::function<void()> onClick;
+public:
+    Button(const sf::Vector2f& size, const sf::Vector2f& position, const sf::Font& font, 
+           const std::string& label, const sf::Color& defaultColor, 
+           const sf::Color& hoverColor, const sf::Color& activeColor);
+    void setOnClick(const std::function<void()>& callback);
+    void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window);
 };

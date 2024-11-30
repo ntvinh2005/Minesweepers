@@ -117,3 +117,78 @@ void InputBox::draw(sf::RenderWindow& window){
 string InputBox::getText() {
     return content;
 }
+
+void Sprite::setTexture (string texturePath) {
+    texture = ResourceManager::getTexture(texturePath);
+    sprite.setTexture(texture);
+}
+
+void Sprite::setPosition(float x, float y) {
+    sprite.setPosition(x, y);
+}
+
+void Sprite::setScale(float scaleX, float scaleY) {
+    sprite.setScale(scaleX, scaleY);
+}
+
+void Sprite::setOrigin(float x, float y) {
+    sprite.setOrigin(x, y);
+}
+
+void Sprite::draw(sf::RenderWindow& window) {
+    window.draw(sprite);
+}
+
+sf::Sprite& Sprite::getSprite() {
+    return sprite;
+}
+
+Button::Button(const sf::Vector2f& size, const sf::Vector2f& position, const sf::Font& font, 
+        const std::string& label, const sf::Color& defaultColor, 
+        const sf::Color& hoverColor, const sf::Color& activeColor) {
+    box.setSize(size);
+    box.setPosition(position);
+    box.setFillColor(defaultColor);
+    this->defaultColor = defaultColor;
+    this->hoverColor = hoverColor;
+    this->activeColor = activeColor;
+
+    text.setFont(font);
+    text.setString(label);
+    text.setCharacterSize(18);
+    text.setFillColor(sf::Color::White);
+
+    sf::FloatRect textBounds = text.getLocalBounds();
+    text.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
+    text.setPosition(position.x + size.x / 2.0f, position.y + size.y / 2.0f);
+};
+
+void Button::setOnClick(const std::function<void()>& callback) {
+    onClick = callback;
+}
+
+void Button::handleEvent(const sf::Event& event, const sf::RenderWindow& window) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    sf::Vector2f mousePosF(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
+
+    if (box.getGlobalBounds().contains(mousePosF)) {
+        box.setFillColor(hoverColor);
+
+        // Check for click
+        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            box.setFillColor(activeColor);
+        }
+        if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+            if (onClick) {
+                onClick(); 
+            }
+        }
+    } else {
+        box.setFillColor(defaultColor);
+    }
+}
+
+void Button::draw(sf::RenderWindow& window) {
+    window.draw(box);
+    window.draw(text);
+}
