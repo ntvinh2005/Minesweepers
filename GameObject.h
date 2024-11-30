@@ -1,6 +1,7 @@
 #include "UIelement.h"
 #include <chrono>
 #include <iostream>
+#pragma once
 
 class Mine {
 
@@ -36,11 +37,12 @@ public:
 
 class TimerDisplay {
 private:
-    Sprite minSprite;
-    Sprite secSprite;
+    vector<Sprite> minSprites;
+    vector<Sprite> secSprites;
     int DIGIT_WIDTH = 21;
     int DIGIT_HEIGHT = 32;
 public:
+    TimerDisplay() {};
     TimerDisplay(string texturePath);
     void update(int elapsedTime);
     void draw(sf::RenderWindow& window);

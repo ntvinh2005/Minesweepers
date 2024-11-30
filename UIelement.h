@@ -4,22 +4,14 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 using namespace std;
+#pragma once
 
 class ResourceManager {
 private:
     static std::map<std::string, sf::Texture> textures;
 public:
     static sf::Font& getFont(std::string& fontPath);
-    static sf::Texture& getTexture(const std::string& texturePath) {
-        if (textures.find(texturePath) == textures.end()) {
-            sf::Texture texture;
-            if (!texture.loadFromFile(texturePath)) {
-                throw std::runtime_error("Error: Could not load texture from " + texturePath);
-            }
-            textures[texturePath] = std::move(texture);
-        }
-        return textures[texturePath];
-    }
+    static sf::Texture& getTexture(const std::string& texturePath);
 };
 
 class Label {

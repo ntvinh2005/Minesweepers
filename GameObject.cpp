@@ -43,31 +43,54 @@ int Timer::getElapsedTimeInSeconds() {
 }
 
 TimerDisplay::TimerDisplay(string texturePath) {
-    minSprite.setTexture(texturePath);
-    secSprite.setTexture(texturePath);
+    minSprites.push_back(Sprite());
+    minSprites.push_back(Sprite());
+    secSprites.push_back(Sprite());
+    secSprites.push_back(Sprite());
 
-    minSprite.setPosition(50, 50);
-    secSprite.setPosition(50 + 2 * DIGIT_WIDTH + 10, 50);
+    // Set texture for all the sprites
+    for (auto& sprite : minSprites) {
+        sprite.setTexture(texturePath);
+    }
+
+    for (auto& sprite : secSprites) {
+        sprite.setTexture(texturePath);
+    }
+
+    // Position the sprites (adjust based on your layout)
+    minSprites[0].setPosition(50, 50);  // Tens place of minutes
+    minSprites[1].setPosition(50 + DIGIT_WIDTH, 50);  // Ones place of minutes
+
+    secSprites[0].setPosition(50 + 2 * DIGIT_WIDTH + 10, 50);  // Tens place of seconds
+    secSprites[1].setPosition(50 + 3 * DIGIT_WIDTH + 10, 50);
 }
 
 void TimerDisplay::update(int elapsedTime) {
     int minutes = elapsedTime / 60;
     int seconds = elapsedTime % 60;
 
+    // Extract the tens and ones digits for minutes
     int minTens = minutes / 10;
     int minOnes = minutes % 10;
 
+    // Extract the tens and ones digits for seconds
     int secTens = seconds / 10;
     int secOnes = seconds % 10;
 
-    minSprite.getSprite().setTextureRect(sf::IntRect(minTens * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
-    minSprite.getSprite().setTextureRect(sf::IntRect(minOnes * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    // Set the textures for the digits (digits are placed horizontally)
+    minSprites[0].getSprite().setTextureRect(sf::IntRect(minTens * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    minSprites[1].getSprite().setTextureRect(sf::IntRect(minOnes * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
 
-    secSprite.getSprite().setTextureRect(sf::IntRect(secTens * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
-    secSprite.getSprite().setTextureRect(sf::IntRect(secOnes * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    secSprites[0].getSprite().setTextureRect(sf::IntRect(secTens * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    secSprites[1].getSprite().setTextureRect(sf::IntRect(secOnes * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
 }
 
 void TimerDisplay::draw(sf::RenderWindow& window) {
-    minSprite.draw(window);
-    secSprite.draw(window);
+    for (auto& sprite : minSprites) {
+        sprite.draw(window);
+    }
+
+    for (auto& sprite : secSprites) {
+        sprite.draw(window);
+    }
 }

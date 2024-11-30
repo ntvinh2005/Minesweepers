@@ -71,6 +71,8 @@ GameWindow::GameWindow(int _rowCount, int _colCount, UserData& _userData) : Wind
     this->height = (_rowCount * 32)+100;
     this->width = _colCount * 32;
     window.create(sf::VideoMode(width, height), "Game Window");
+    timer.start();
+    timerDisplay = TimerDisplay("files/images/digits.png");
 }
 
 void GameWindow::handleEvent() {
@@ -82,11 +84,14 @@ void GameWindow::handleEvent() {
 }
 
 void GameWindow::update() {
-
+    int elapsedTime = timer.getElapsedTimeInSeconds();
+    //std::cout << "Elapsed time: " << elapsedTime << " seconds" << std::endl;
+    timerDisplay.update(elapsedTime);
 }
 
 void GameWindow::render() {
     window.clear(sf::Color::Blue);
+    timerDisplay.draw(window);
     window.display();
 }
 

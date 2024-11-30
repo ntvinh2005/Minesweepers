@@ -4,7 +4,9 @@
 #include <iostream>
 #include "UIelement.h"
 #include "UserData.h"
+#include "GameObject.h"
 using namespace std;
+#pragma once
 
 class Window {
 protected:
@@ -41,6 +43,9 @@ public:
 };
 
 class GameWindow : public Window {
+private:
+    Timer timer;
+    TimerDisplay timerDisplay;
 public:
     GameWindow(int _rowCount, int _colCount, UserData& _userData);
     void handleEvent() override;

@@ -10,6 +10,19 @@ sf::Font& ResourceManager::getFont(std::string& fontPath) {
     return fonts[fontPath];
 }
 
+std::map<std::string, sf::Texture> ResourceManager::textures;
+sf::Texture& ResourceManager::getTexture(const std::string& texturePath){
+    if (textures.find(texturePath) == textures.end()) {
+        sf::Texture texture;
+        if (!texture.loadFromFile(texturePath)) {
+            std::cerr << "Error: Could not load texture from " << texturePath << std::endl;
+            throw std::runtime_error("Error: Could not load texture from " + texturePath);
+        }
+        textures[texturePath] = std::move(texture);
+    }
+    return textures[texturePath];
+}
+
 Label::Label(string content, string fontPath, unsigned int fontSize, sf::Color color, sf::Vector2f pos) {
     font = &ResourceManager::getFont(fontPath);
     text.setFont(*font);
@@ -119,8 +132,12 @@ string InputBox::getText() {
 }
 
 void Sprite::setTexture (string texturePath) {
-    texture = ResourceManager::getTexture(texturePath);
-    sprite.setTexture(texture);
+    try {
+        texture = ResourceManager::getTexture(texturePath);
+        sprite.setTexture(texture);
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to set texture: " << e.what() << std::endl;
+    }
 }
 
 void Sprite::setPosition(float x, float y) {
