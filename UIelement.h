@@ -78,15 +78,21 @@ public:
 class Button {
 private:
     sf::RectangleShape box;
-    sf::Text text;
+    Sprite sprite;
+    sf::Texture texture;
+
     sf::Color defaultColor;
     sf::Color hoverColor;
     sf::Color activeColor;
+
     std::function<void()> onClick;
+
 public:
-    Button(const sf::Vector2f& size, const sf::Vector2f& position, const sf::Font& font, 
-           const std::string& label, const sf::Color& defaultColor, 
+    Button() {};
+    Button(const sf::Vector2f& size, const sf::Vector2f& position, 
+           const std::string& spritePath, const sf::Color& defaultColor, 
            const sf::Color& hoverColor, const sf::Color& activeColor);
+
     void setOnClick(const std::function<void()>& callback);
     void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);

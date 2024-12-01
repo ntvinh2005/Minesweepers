@@ -167,25 +167,28 @@ sf::Sprite& Sprite::getSprite() {
     return sprite;
 }
 
-Button::Button(const sf::Vector2f& size, const sf::Vector2f& position, const sf::Font& font, 
-        const std::string& label, const sf::Color& defaultColor, 
-        const sf::Color& hoverColor, const sf::Color& activeColor) {
+Button::Button(const sf::Vector2f& size, const sf::Vector2f& position, 
+               const std::string& spritePath, const sf::Color& defaultColor, 
+               const sf::Color& hoverColor, const sf::Color& activeColor) {
     box.setSize(size);
     box.setPosition(position);
     box.setFillColor(defaultColor);
+
     this->defaultColor = defaultColor;
     this->hoverColor = hoverColor;
     this->activeColor = activeColor;
 
-    text.setFont(font);
-    text.setString(label);
-    text.setCharacterSize(18);
-    text.setFillColor(sf::Color::White);
+    sprite.setTexture(spritePath);
 
-    sf::FloatRect textBounds = text.getLocalBounds();
-    text.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
-    text.setPosition(position.x + size.x / 2.0f, position.y + size.y / 2.0f);
-};
+    sf::FloatRect spriteBounds = sprite.getSprite().getLocalBounds();
+    sprite.setOrigin(spriteBounds.width / 2.0f, spriteBounds.height / 2.0f);
+    sprite.setPosition(position.x + size.x / 2.0f, position.y + size.y / 2.0f);
+
+    float scaleX = size.x / spriteBounds.width * 0.95f; 
+    float scaleY = size.y / spriteBounds.height * 0.95f;
+    sprite.setScale(scaleX, scaleY);
+}
+
 
 void Button::setOnClick(const std::function<void()>& callback) {
     onClick = callback;
@@ -198,13 +201,12 @@ void Button::handleEvent(const sf::Event& event, const sf::RenderWindow& window)
     if (box.getGlobalBounds().contains(mousePosF)) {
         box.setFillColor(hoverColor);
 
-        // Check for click
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             box.setFillColor(activeColor);
         }
         if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
             if (onClick) {
-                onClick(); 
+                onClick();
             }
         }
     } else {
@@ -214,5 +216,5 @@ void Button::handleEvent(const sf::Event& event, const sf::RenderWindow& window)
 
 void Button::draw(sf::RenderWindow& window) {
     window.draw(box);
-    window.draw(text);
+    sprite.draw(window);
 }

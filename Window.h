@@ -46,7 +46,12 @@ class GameWindow : public Window {
 private:
     Timer timer;
     TimerDisplay timerDisplay;
+    Counter counter;
     Board board;
+    Button resetButton;
+    Button debugButton;
+    Button pauseButton;
+    Button leaderboardButton;
 public:
     GameWindow(int _rowCount, int _colCount, UserData& _userData);
     void handleEvent() override;
@@ -61,3 +66,8 @@ public:
     void update() override;
     void render() override;
 };
+
+void resetOnClick(Timer& timer, Board& board);
+void debugOnClick(Board& board);
+void pauseOnClick(Timer& timer);
+void leaderboardOnClick(LeaderboardWindow& leaderboardWindow);

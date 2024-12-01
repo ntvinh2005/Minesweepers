@@ -12,7 +12,8 @@ private:
     bool isRevealed;
     vector<Tile*> adjacentTiles;
     int adjacentMines;
-    Sprite sprite;
+    Sprite revealSprite;
+    Sprite numberSprite;
     Sprite mineSprite;
     sf::Vector2f position;
     int tileSize;
@@ -36,7 +37,7 @@ public:
 
 class Board {
 private:
-    vector<vector<Tile>> tiles;;
+    vector<vector<Tile>> tiles;
     int rowCount;
     int colCount;
     int mineCount;
@@ -51,12 +52,25 @@ public:
     void reset();
     void update();
     void handleClick(sf::Vector2i mousePosition, bool isRightClick);
+    vector<vector<Tile>>& getTiles();
+    int countFlag();
 };
 
 class Counter {
 private:
-    int mineLeftNum = 50;
+    std::vector<Sprite> digitSprites; 
+    int count;       
+    int DIGIT_WIDTH = 21;
+    int DIGIT_HEIGHT = 32;                 
+
+public:
+    Counter() {};
+    Counter(std::string texturePath, float x, float y);
+    void setCount(int flags);
+    void updateDisplay();
+    void draw(sf::RenderWindow& window);
 };
+
 
 class Timer {
 private:
@@ -75,6 +89,7 @@ public:
     void pause();
     void resume();
     int getElapsedTimeInSeconds();
+    bool checkPauseStatus();
 };
 
 class TimerDisplay {

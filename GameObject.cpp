@@ -4,9 +4,12 @@ Tile::Tile(bool _hasMine, sf::Vector2f _position) {
     hasMine = _hasMine;
     hasFlag = false;
     isRevealed = false;
-    sprite.setTexture("files/images/tile_hidden.png");
+    
     position = _position;
-    sprite.setPosition(position.x, position.y);
+    revealSprite.setTexture("files/images/tile_revealed.png");
+    revealSprite.setPosition(position.x, position.y);
+    numberSprite.setTexture("files/images/tile_hidden.png");
+    numberSprite.setPosition(position.x, position.y);
     mineSprite.setTexture("files/images/tile_hidden.png");
     mineSprite.setPosition(position.x, position.y);
     mineSprite.setColor(sf::Color(255, 255, 255, 0));
@@ -18,7 +21,7 @@ void Tile::reveal() {
 }
 
 void Tile::update() {
-    if (!sprite.getSprite().getTexture()) {
+    if (!numberSprite.getSprite().getTexture()) {
         std::cout << "Failed to load texture!" << std::endl;
     }
 
@@ -27,9 +30,11 @@ void Tile::update() {
             mineSprite.setColor(sf::Color(255, 255, 255, 255));
             mineSprite.setTexture("files/images/mine.png");
         } else if (adjacentMines > 0) {
-            sprite.setTexture("files/images/number_" + std::to_string(adjacentMines) + ".png");
+            numberSprite.setTexture("files/images/number_" + std::to_string(adjacentMines) + ".png");
+            numberSprite.setColor(sf::Color(255, 255, 255, 255));
         } else {
-            sprite.setTexture("files/images/tile_revealed.png");
+            numberSprite.setTexture("files/images/tile_revealed.png");
+            numberSprite.setColor(sf::Color(255, 255, 255, 0));
         }
     }
 
@@ -37,10 +42,15 @@ void Tile::update() {
         mineSprite.setColor(sf::Color(255, 255, 255, 255));
         mineSprite.setTexture("files/images/flag.png");
     }
+    else if (!hasMine) {
+        mineSprite.setColor(sf::Color(255, 255, 255, 0));
+        mineSprite.setTexture("files/images/tile_hidden.png");
+    }
 }
 
 void Tile::draw(sf::RenderWindow& window) {
-    sprite.draw(window);
+    revealSprite.draw(window);
+    numberSprite.draw(window);
     if (hasMine || hasFlag) mineSprite.draw(window);
 }
 
@@ -48,7 +58,8 @@ void Tile::reset() {
     hasMine = false;
     hasFlag = false;
     isRevealed = false;
-    sprite.setTexture("files/images/tile_hidden.png");
+    numberSprite.setTexture("files/images/tile_hidden.png");
+    numberSprite.setColor(sf::Color(255, 255, 255, 255));
     mineSprite.setColor(sf::Color(255, 255, 255, 0));
 }
 
@@ -146,8 +157,8 @@ void Board::findAdjacent() {
                     if (dx >= 0 && dx < rowCount && dy >= 0 && dy < colCount) {
                         if (tiles[dx][dy].isMine()) {
                             adjacentMineCount ++;
-                            adjTiles.push_back(&tiles[dx][dy]);
                         }
+                        adjTiles.push_back(&tiles[dx][dy]);
                     }
                 }
             }
@@ -217,6 +228,7 @@ void Board::handleClick(sf::Vector2i mousePosition, bool isRightClick) {
         } else {
             if (!clickedTile.checkFlag()) {
                 if (clickedTile.isMine()) {
+                    clickedTile.reveal();
                     std::cout << "Game Over!" << std::endl;
                 } else {
                     revealAdjacent(&clickedTile);
@@ -226,6 +238,56 @@ void Board::handleClick(sf::Vector2i mousePosition, bool isRightClick) {
     }
 }
 
+int Board::countFlag() {
+    int flagCount = 0;
+    for (auto& row : tiles) {
+        for (auto& tile : row) {
+            if (tile.checkFlag()) flagCount++;
+        }
+    }
+    return flagCount;
+}
+
+vector<vector<Tile>>& Board::getTiles() {
+    return tiles;
+};
+
+Counter::Counter(std::string texturePath, float x, float y) {
+    for (int i = 0; i < 3; ++i) {
+        Sprite sprite;
+        sprite.setTexture(texturePath);
+        sprite.setPosition(x + i * DIGIT_WIDTH, y);
+        digitSprites.push_back(sprite);
+    }
+    count = 50; 
+    updateDisplay();
+}
+
+void Counter::setCount(int flags) {
+    count = 50 - flags;
+    updateDisplay();
+}
+
+void Counter::updateDisplay() {
+    int displayCount = std::abs(count); 
+    int hundreds = (displayCount / 100) % 10;
+    int tens = (displayCount / 10) % 10;
+    int ones = displayCount % 10;
+
+    // Update texture rectangles for each digit
+    digitSprites[0].getSprite().setTextureRect(sf::IntRect(hundreds * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    digitSprites[1].getSprite().setTextureRect(sf::IntRect(tens * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    digitSprites[2].getSprite().setTextureRect(sf::IntRect(ones * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
+    if (count < 0) {
+        digitSprites[0].getSprite().setTextureRect(sf::IntRect(10 * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT)); // Assuming 10th digit is the "-" sign
+    }
+}
+
+void Counter::draw(sf::RenderWindow& window) {
+    for (auto& sprite : digitSprites) {
+        sprite.draw(window);
+    }
+}
 
 void Timer::start() {
     running = true;
@@ -267,6 +329,10 @@ int Timer::getElapsedTimeInSeconds() {
 
     auto now = paused ? pauseStartTime : std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count() - pausedDuration.count();
+}
+
+bool Timer::checkPauseStatus() {
+    return paused;
 }
 
 TimerDisplay::TimerDisplay(string texturePath, float x, float y) {
