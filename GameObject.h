@@ -1,19 +1,57 @@
 #include "UIelement.h"
 #include <chrono>
 #include <iostream>
+#include <random>
+#include <algorithm>
 #pragma once
-
-class Mine {
-
-};
 
 class Tile {
 private:
     bool hasMine; 
+    bool hasFlag;
+    bool isRevealed;
+    vector<Tile*> adjacentTiles;
+    int adjacentMines;
+    Sprite sprite;
+    Sprite mineSprite;
+    sf::Vector2f position;
+    int tileSize;
+public:
+    Tile(bool _hasMine, sf::Vector2f _position);
+    void update();
+    void reveal();
+    void draw(sf::RenderWindow& window);
+    void reset();
+    void setMine();
+    bool isMine();
+    bool checkRevealed();
+    bool checkFlag();
+    void setAdjacentMineCount(int mineCount);
+    void setAdjacentTiles(vector<Tile*> _adjacentTiles);
+    int getAdjacentMines();
+    vector<Tile*>& getAdjacentTiles();
+};
+
+class Board {
+private:
+    vector<vector<Tile>> tiles;
+    int rowCount;
+    int colCount;
+    int mineCount;
+public:
+    Board();
+    void revealAdjacent(Tile* tile);
+    void draw(sf::RenderWindow& window);
+    void assignMines();
+    void findAdjacent();
+    bool checkWin();
+    void reset();
+    void update();
 };
 
 class Counter {
-
+private:
+    int mineLeftNum = 50;
 };
 
 class Timer {

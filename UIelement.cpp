@@ -148,6 +148,10 @@ void Sprite::setScale(float scaleX, float scaleY) {
     sprite.setScale(scaleX, scaleY);
 }
 
+void Sprite::setColor(sf::Color color) {
+    sprite.setColor(color);
+}
+
 void Sprite::setOrigin(float x, float y) {
     sprite.setOrigin(x, y);
 }

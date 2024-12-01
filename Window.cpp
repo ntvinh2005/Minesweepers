@@ -87,11 +87,13 @@ void GameWindow::update() {
     int elapsedTime = timer.getElapsedTimeInSeconds();
     //std::cout << "Elapsed time: " << elapsedTime << " seconds" << std::endl;
     timerDisplay.update(elapsedTime);
+    board.update();
 }
 
 void GameWindow::render() {
     window.clear(sf::Color::Blue);
     timerDisplay.draw(window);
+    board.draw(window);
     window.display();
 }
 

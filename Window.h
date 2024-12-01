@@ -46,6 +46,7 @@ class GameWindow : public Window {
 private:
     Timer timer;
     TimerDisplay timerDisplay;
+    Board board;
 public:
     GameWindow(int _rowCount, int _colCount, UserData& _userData);
     void handleEvent() override;

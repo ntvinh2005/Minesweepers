@@ -65,6 +65,7 @@ public:
     void setTexture (string texturePath);
     void setPosition(float x, float y);
     void setScale(float scaleX, float scaleY);
+    void setColor(sf::Color color);
 
     void setOrigin(float x, float y);
 
