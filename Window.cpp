@@ -72,7 +72,8 @@ GameWindow::GameWindow(int _rowCount, int _colCount, UserData& _userData) : Wind
     this->width = _colCount * 32;
     window.create(sf::VideoMode(width, height), "Game Window");
     timer.start();
-    timerDisplay = TimerDisplay("files/images/digits.png");
+    timerDisplay = TimerDisplay("files/images/digits.png", width - 100, height - 50);
+    board = Board(_rowCount, _colCount, 50);
 }
 
 void GameWindow::handleEvent() {

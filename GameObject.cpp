@@ -9,6 +9,7 @@ Tile::Tile(bool _hasMine, sf::Vector2f _position) {
     sprite.setPosition(position.x, position.y);
     mineSprite.setTexture("files/images/tile_hidden.png");
     mineSprite.setPosition(position.x, position.y);
+    mineSprite.setColor(sf::Color(255, 255, 255, 0));
     tileSize = 32;
 }
 
@@ -17,6 +18,10 @@ void Tile::reveal() {
 }
 
 void Tile::update() {
+    if (!sprite.getSprite().getTexture()) {
+        std::cout << "Failed to load texture!" << std::endl;
+    }
+
     if (isRevealed) {
         if (hasMine) {
             mineSprite.setColor(sf::Color(255, 255, 255, 255));
@@ -79,12 +84,13 @@ vector<Tile*>& Tile::getAdjacentTiles() {
     return adjacentTiles;
 }
 
-Board::Board() {
-    rowCount = 16;
-    colCount = 25;
-    mineCount = 50;
-    tiles.resize(rowCount, vector<Tile>(colCount, Tile(false, sf::Vector2f(0, 0))));
+Board::Board(int _rowCount, int _colCount, int _mineCount) {
+    rowCount = _rowCount;
+    colCount = _colCount;
+    mineCount = _mineCount;
+    tiles.resize(rowCount);
     for (int i = 0; i < rowCount; ++i) {
+        tiles[i].resize(colCount);
         for (int j = 0; j < colCount; ++j) {
             bool hasMine = false;
             tiles[i][j] = Tile(hasMine, sf::Vector2f(j * 32, i * 32));
@@ -96,9 +102,9 @@ Board::Board() {
 }
 
 void Board::draw(sf::RenderWindow& window) {
-    for (int row = 0; row < rowCount; ++row) {
-        for (int col = 0; col < colCount; ++col) {
-            tiles[row][col].draw(window);
+    for (auto& row : tiles) {
+        for (auto& tile : row) {
+            tile.draw(window);
         }
     }
 }
@@ -113,8 +119,8 @@ void Board::assignMines() {
     shuffle(availableTiles.begin(), availableTiles.end(), gen);
     for (int i = 0; i < mineCount; i++) {
         int index = availableTiles[i];
-        int row = index / rowCount;
-        int col = index % rowCount;
+        int row = index / colCount;
+        int col = index % colCount;
         tiles[row][col].setMine();
     }
     cout << "Assigned Mine" << endl;
@@ -163,9 +169,9 @@ void Board::revealAdjacent(Tile* tile) {
 
 bool Board::checkWin() {
     bool won = true;
-    for (int i = 0; i < rowCount; ++i) {
-        for (int j = 0; j < colCount; ++j) {
-            if (!tiles[i][j].isMine() && !tiles[i][j].checkRevealed()) {
+    for (auto& row : tiles) {
+        for (auto& tile : row) {
+            if (!tile.isMine() && !tile.checkRevealed()) {
                 return false;
             }
         }
@@ -233,7 +239,7 @@ int Timer::getElapsedTimeInSeconds() {
     return std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count() - pausedDuration.count();
 }
 
-TimerDisplay::TimerDisplay(string texturePath) {
+TimerDisplay::TimerDisplay(string texturePath, float x, float y) {
     minSprites.push_back(Sprite());
     minSprites.push_back(Sprite());
     secSprites.push_back(Sprite());
@@ -247,11 +253,11 @@ TimerDisplay::TimerDisplay(string texturePath) {
         sprite.setTexture(texturePath);
     }
 
-    minSprites[0].setPosition(800, 562);  
-    minSprites[1].setPosition(800 + DIGIT_WIDTH, 562);  
+    minSprites[0].setPosition(x, y);  
+    minSprites[1].setPosition(x + DIGIT_WIDTH, y);  
 
-    secSprites[0].setPosition(800 + 2 * DIGIT_WIDTH + 10, 562); 
-    secSprites[1].setPosition(800 + 3 * DIGIT_WIDTH + 10, 562);
+    secSprites[0].setPosition(x + 2 * DIGIT_WIDTH + 10, y); 
+    secSprites[1].setPosition(x + 3 * DIGIT_WIDTH + 10, y);
 }
 
 void TimerDisplay::update(int elapsedTime) {

@@ -17,6 +17,7 @@ private:
     sf::Vector2f position;
     int tileSize;
 public:
+    Tile() {};
     Tile(bool _hasMine, sf::Vector2f _position);
     void update();
     void reveal();
@@ -34,12 +35,13 @@ public:
 
 class Board {
 private:
-    vector<vector<Tile>> tiles;
+    vector<vector<Tile>> tiles;;
     int rowCount;
     int colCount;
     int mineCount;
 public:
-    Board();
+    Board() {};
+    Board(int _rowCount, int _colCount, int _minCount);
     void revealAdjacent(Tile* tile);
     void draw(sf::RenderWindow& window);
     void assignMines();
@@ -81,7 +83,7 @@ private:
     int DIGIT_HEIGHT = 32;
 public:
     TimerDisplay() {};
-    TimerDisplay(string texturePath);
+    TimerDisplay(string texturePath, float x, float y);
     void update(int elapsedTime);
     void draw(sf::RenderWindow& window);
 };

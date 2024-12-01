@@ -10,17 +10,19 @@ sf::Font& ResourceManager::getFont(std::string& fontPath) {
     return fonts[fontPath];
 }
 
-std::map<std::string, sf::Texture> ResourceManager::textures;
-sf::Texture& ResourceManager::getTexture(const std::string& texturePath){
-    if (textures.find(texturePath) == textures.end()) {
-        sf::Texture texture;
-        if (!texture.loadFromFile(texturePath)) {
+std::map<std::string, std::shared_ptr<sf::Texture>> ResourceManager::textures;
+std::shared_ptr<sf::Texture> ResourceManager::getTexture(const std::string& texturePath) {
+    auto it = textures.find(texturePath);
+    if (it == textures.end()) {
+        std::shared_ptr<sf::Texture> texture = std::make_shared<sf::Texture>();
+        if (!texture->loadFromFile(texturePath)) {
             std::cerr << "Error: Could not load texture from " << texturePath << std::endl;
             throw std::runtime_error("Error: Could not load texture from " + texturePath);
         }
-        textures[texturePath] = std::move(texture);
+        textures[texturePath] = texture;
+        return texture;
     }
-    return textures[texturePath];
+    return it->second;  
 }
 
 Label::Label(string content, string fontPath, unsigned int fontSize, sf::Color color, sf::Vector2f pos) {
@@ -131,10 +133,11 @@ string InputBox::getText() {
     return content;
 }
 
-void Sprite::setTexture (string texturePath) {
+void Sprite::setTexture(string texturePath) {
     try {
-        texture = ResourceManager::getTexture(texturePath);
-        sprite.setTexture(texture);
+        std::shared_ptr<sf::Texture> texturePtr = ResourceManager::getTexture(texturePath);
+
+        sprite.setTexture(*texturePtr);
     } catch (const std::exception& e) {
         std::cerr << "Failed to set texture: " << e.what() << std::endl;
     }

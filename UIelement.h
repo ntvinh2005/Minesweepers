@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include <functional>
 using namespace std;
@@ -8,10 +9,10 @@ using namespace std;
 
 class ResourceManager {
 private:
-    static std::map<std::string, sf::Texture> textures;
+    static std::map<std::string, std::shared_ptr<sf::Texture>> textures;
 public:
     static sf::Font& getFont(std::string& fontPath);
-    static sf::Texture& getTexture(const std::string& texturePath);
+    static std::shared_ptr<sf::Texture> getTexture(const std::string& texturePath);
 };
 
 class Label {
@@ -61,7 +62,7 @@ private:
     sf::Sprite sprite;
     sf::Texture texture;
 public:
-    Sprite() = default;
+    Sprite() {};
     void setTexture (string texturePath);
     void setPosition(float x, float y);
     void setScale(float scaleX, float scaleY);
