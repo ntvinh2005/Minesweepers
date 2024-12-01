@@ -31,6 +31,7 @@ public:
     void setAdjacentTiles(vector<Tile*> _adjacentTiles);
     int getAdjacentMines();
     vector<Tile*>& getAdjacentTiles();
+    void toggleFlag();
 };
 
 class Board {
@@ -49,6 +50,7 @@ public:
     bool checkWin();
     void reset();
     void update();
+    void handleClick(sf::Vector2i mousePosition, bool isRightClick);
 };
 
 class Counter {

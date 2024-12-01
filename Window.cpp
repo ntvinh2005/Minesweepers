@@ -79,8 +79,19 @@ GameWindow::GameWindow(int _rowCount, int _colCount, UserData& _userData) : Wind
 void GameWindow::handleEvent() {
     sf::Event event;
     while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed)
+        if (event.type == sf::Event::Closed) {
             window.close();
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed) {
+            sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                board.handleClick(mousePosition, false);
+            } else if (event.mouseButton.button == sf::Mouse::Right) {
+                board.handleClick(mousePosition, true);
+            }
+        }
     }
 }
 

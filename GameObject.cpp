@@ -84,6 +84,12 @@ vector<Tile*>& Tile::getAdjacentTiles() {
     return adjacentTiles;
 }
 
+void Tile::toggleFlag() {
+    if (!isRevealed) {
+        hasFlag = !hasFlag;
+    }
+}
+
 Board::Board(int _rowCount, int _colCount, int _mineCount) {
     rowCount = _rowCount;
     colCount = _colCount;
@@ -196,6 +202,30 @@ void Board::update() {
         }
     }
 }
+
+void Board::handleClick(sf::Vector2i mousePosition, bool isRightClick) {
+    int col = mousePosition.x / 32;
+    int row = mousePosition.y / 32;
+
+    if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
+        Tile& clickedTile = tiles[row][col];
+        
+        if (isRightClick) {
+            if (!clickedTile.checkRevealed()) {
+                clickedTile.toggleFlag();
+            }
+        } else {
+            if (!clickedTile.checkFlag()) {
+                if (clickedTile.isMine()) {
+                    std::cout << "Game Over!" << std::endl;
+                } else {
+                    revealAdjacent(&clickedTile);
+                }
+            }
+        }
+    }
+}
+
 
 void Timer::start() {
     running = true;
