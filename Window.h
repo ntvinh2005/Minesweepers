@@ -52,6 +52,7 @@ private:
     Button debugButton;
     Button pauseButton;
     Button leaderboardButton;
+    bool leaderboardOpened;
 public:
     GameWindow(int _rowCount, int _colCount, UserData& _userData);
     void handleEvent() override;
@@ -67,7 +68,7 @@ public:
     void render() override;
 };
 
-void resetOnClick(Timer& timer, Board& board);
+void resetOnClick(Timer& timer, Board& board, Button* button);
 void debugOnClick(Board& board);
-void pauseOnClick(Timer& timer);
+void pauseOnClick(Timer& timer, Button* button);
 void leaderboardOnClick(LeaderboardWindow& leaderboardWindow);

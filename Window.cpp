@@ -84,7 +84,7 @@ GameWindow::GameWindow(int _rowCount, int _colCount, UserData& _userData) : Wind
         sf::Color(100, 100, 100)              
     );
     resetButton.setOnClick([&]() {
-        resetOnClick(timer, board);
+        resetOnClick(timer, board, &resetButton);
     });
     debugButton = Button(
         sf::Vector2f(50, 50),                    
@@ -106,7 +106,7 @@ GameWindow::GameWindow(int _rowCount, int _colCount, UserData& _userData) : Wind
         sf::Color(100, 100, 100)              
     );
     pauseButton.setOnClick([&]() {
-        pauseOnClick(timer);
+        pauseOnClick(timer, &pauseButton);
     });
     leaderboardButton = Button(
         sf::Vector2f(50, 50),                  
@@ -120,6 +120,8 @@ GameWindow::GameWindow(int _rowCount, int _colCount, UserData& _userData) : Wind
     leaderboardButton.setOnClick([&]() {
         leaderboardOnClick(leaderboardWindow);
     });
+
+    leaderboardOpened = false;
 }
 
 void GameWindow::handleEvent() {
@@ -139,6 +141,19 @@ void GameWindow::handleEvent() {
                 int flagCount = board.countFlag();
                 counter.setCount(flagCount);
                 counter.updateDisplay();
+            }
+            board.checkWin();
+            if (board.getWinStatus() == 0) resetButton.setSprite("files/images/face_lose.png");
+            else if (board.getWinStatus() == 1) resetButton.setSprite("files/images/face_happy.png");
+            else if (board.getWinStatus() == 2) {
+                resetButton.setSprite("files/images/face_win.png");
+                update();
+                render();
+                if (!leaderboardOpened) {
+                    leaderboardOpened = true;  
+                    LeaderboardWindow leaderboardWindow(16, 25, userData);
+                    leaderboardWindow.run();  
+                }
             }
         }
 
@@ -191,8 +206,9 @@ void LeaderboardWindow::render() {
     window.display();
 }
 
-void resetOnClick(Timer& timer, Board& board) {
+void resetOnClick(Timer& timer, Board& board, Button* button) {
     cout << "Reset Button OnClick" << endl;
+    button->setSprite("files/images/face_happy.png");
     timer.reset();
     timer.start();
     board.reset();
@@ -205,12 +221,19 @@ void debugOnClick(Board& board) {
             if (tile.isMine()) tile.reveal();
         }
     }
+    board.turnonDebugMode();
 }
 
-void pauseOnClick(Timer& timer) {
+void pauseOnClick(Timer& timer, Button* button) {
     cout << "Pause Button OnClick" << endl;
-    if (timer.checkPauseStatus()) timer.resume();
-    else timer.pause();
+    if (timer.checkPauseStatus()) {
+        timer.resume();
+        button->setSprite("files/images/pause.png");
+    }
+    else {
+        timer.pause();
+        button->setSprite("files/images/play.png");
+    }
 }
 
 void leaderboardOnClick(LeaderboardWindow& leaderboardWindow) {

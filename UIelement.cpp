@@ -218,3 +218,7 @@ void Button::draw(sf::RenderWindow& window) {
     window.draw(box);
     sprite.draw(window);
 }
+
+void Button::setSprite(string spritePath) {
+    sprite.setTexture(spritePath);
+}

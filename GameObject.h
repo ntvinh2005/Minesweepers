@@ -41,6 +41,8 @@ private:
     int rowCount;
     int colCount;
     int mineCount;
+    int winStatus; // 0 is lose, 1 is undecided, 2 is win.
+    bool debugMode;
 public:
     Board() {};
     Board(int _rowCount, int _colCount, int _minCount);
@@ -48,12 +50,14 @@ public:
     void draw(sf::RenderWindow& window);
     void assignMines();
     void findAdjacent();
-    bool checkWin();
+    void checkWin();
+    int getWinStatus();
     void reset();
     void update();
     void handleClick(sf::Vector2i mousePosition, bool isRightClick);
     vector<vector<Tile>>& getTiles();
     int countFlag();
+    void turnonDebugMode();
 };
 
 class Counter {

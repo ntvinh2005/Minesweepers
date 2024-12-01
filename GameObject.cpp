@@ -184,19 +184,29 @@ void Board::revealAdjacent(Tile* tile) {
     }
 }
 
-bool Board::checkWin() {
-    bool won = true;
+void Board::checkWin() {
+    winStatus = 1;
+    bool allRevealed = true;
     for (auto& row : tiles) {
         for (auto& tile : row) {
-            if (!tile.isMine() && !tile.checkRevealed()) {
-                return false;
+            if (tile.isMine() && tile.checkRevealed() && !debugMode) {
+                winStatus = 0;
+                return;
+            }
+            if (!tile.checkRevealed() && !tile.checkFlag()) {
+                allRevealed = false;
             }
         }
     }
-    return true;
+    if (allRevealed) winStatus = 2;
+}
+
+int Board::getWinStatus() {
+    return winStatus;
 }
 
 void Board::reset() {
+    debugMode = false;
     for (int row = 0; row < rowCount; ++row) {
         for (int col = 0; col < colCount; ++col) {
             tiles[row][col].reset();
@@ -248,6 +258,10 @@ int Board::countFlag() {
     return flagCount;
 }
 
+void Board::turnonDebugMode() {
+    debugMode = true;
+}
+
 vector<vector<Tile>>& Board::getTiles() {
     return tiles;
 };
@@ -274,7 +288,6 @@ void Counter::updateDisplay() {
     int tens = (displayCount / 10) % 10;
     int ones = displayCount % 10;
 
-    // Update texture rectangles for each digit
     digitSprites[0].getSprite().setTextureRect(sf::IntRect(hundreds * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
     digitSprites[1].getSprite().setTextureRect(sf::IntRect(tens * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));
     digitSprites[2].getSprite().setTextureRect(sf::IntRect(ones * DIGIT_WIDTH, 0, DIGIT_WIDTH, DIGIT_HEIGHT));

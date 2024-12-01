@@ -96,4 +96,5 @@ public:
     void setOnClick(const std::function<void()>& callback);
     void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
+    void setSprite(string spritePath);
 };
